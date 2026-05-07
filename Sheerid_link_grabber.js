@@ -8,7 +8,7 @@ const FormData = require('form-data');
 
 const IS_HEADLESS = process.env.HEADLESS === '1' || process.argv.includes('--headless');
 
-const TELEGRAM_TOKEN = '8796052869:AAFAiyxqIZGdCXY2b3zCe4cTVCLmxE6qcBg';
+const TELEGRAM_TOKEN = '8796052869:AAEHphof8l_AvKLT_u-ozT1p1EbDGnuHTuQ';
 const TELEGRAM_CHAT_ID = '7676651391';
 
 const LINK_FILE = path.join(__dirname, 'link.txt');
