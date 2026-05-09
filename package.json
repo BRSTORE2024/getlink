@@ -15,7 +15,6 @@
     "automation",
     "youtube-student"
   ],
-  "author": "Sindu Sindadi",
   "license": "MIT",
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
