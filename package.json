@@ -1,0 +1,28 @@
+{
+  "name": "link-botttt",
+  "version": "2.0.0",
+  "description": "Bot otomatis ambil URL SheerID",
+  "main": "Sheerid_link_grabber.js",
+  "scripts": {
+    "start": "node Sheerid_link_grabber.js",
+    "dev": "node --trace-warnings Sheerid_link_grabber.js"
+  },
+  "keywords": [
+    "puppeteer",
+    "bot",
+    "telegram",
+    "automation",
+    "youtube-student"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "form-data": "^4.0.5",
+    "puppeteer": "^24.33.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
