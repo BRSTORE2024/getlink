@@ -429,7 +429,7 @@ process.on('uncaughtException', (err) => {
     fs.mkdirSync(tempDir, { recursive: true });
   }
   
-  const akunList = fs.readFileSync('akun.txt', 'utf-8')
+  const akunList = fs.readFileSync('AKUN.txt', 'utf-8')
     .split('\n')
     .filter(Boolean)
     .map(line => {
