@@ -2,9 +2,9 @@
   "name": "link-botttt",
   "version": "2.0.0",
   "description": "Bot otomatis ambil URL SheerID",
-  "main": "Sheerid_link_grabber.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node Sheerid_link_grabber.js",
+    "start": "node main.js --headless",
     "dev": "node --trace-warnings Sheerid_link_grabber.js"
   },
   "keywords": [
