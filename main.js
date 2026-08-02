@@ -23,18 +23,13 @@ const saveSheerIDUrl = async (email, url) => {
         .filter(line => line.trim());
     }
     
-    
     const newEntry = `${email}:${url}`;
-    
-    
     const isEmailExists = existingEntries.some(entry => entry.startsWith(`${email}:`));
     
     if (!isEmailExists) {
       existingEntries.push(newEntry);
       fs.writeFileSync(LINK_FILE, existingEntries.join('\n'));
       console.log(`✅ URL SheerID disimpan untuk ${email}`);
-      
-      
       await kirimTelegram(`🔗 *URL SheerID Baru:*\n\`${email}\`\n\`${url}\``);
     } else {
       console.log(`ℹ️ URL untuk ${email} sudah ada, dilewati`);
@@ -43,7 +38,6 @@ const saveSheerIDUrl = async (email, url) => {
     console.error('❌ Gagal menyimpan URL:', err.message);
   }
 };
-
 
 const kirimTelegram = async (pesan) => {
   const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
@@ -58,12 +52,10 @@ const kirimTelegram = async (pesan) => {
   }
 };
 
-
 const kirimFileTelegram = async (filePath) => {
   const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendDocument`;
   
   try {
-    
     const fileStats = fs.statSync(filePath);
     if (fileStats.size === 0) {
       console.log('⚠️ File kosong, tidak dikirim ke Telegram');
@@ -110,7 +102,6 @@ puppeteer.use(StealthPlugin());
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-
 const askThreadCount = () => {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -130,7 +121,6 @@ const askThreadCount = () => {
   });
 };
 
-
 const displayResults = async () => {
   if (fs.existsSync(LINK_FILE)) {
     const content = fs.readFileSync(LINK_FILE, 'utf-8');
@@ -147,14 +137,11 @@ const displayResults = async () => {
       console.log("-".repeat(80));
     });
     
-    
     await kirimFileTelegram(LINK_FILE);
-    
     return entries.length;
   }
   return 0;
 };
-
 
 const processSingleAccount = async ({ email, pass }, browserIndex, failedAccounts) => {
   console.log(`🚀 [Browser ${browserIndex}] Memproses akun: ${email}`);
@@ -245,63 +232,56 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
     await page.type('input[type="password"]', pass, { delay: 100 });
     await page.keyboard.press('Enter');
 
-	
-	try {
-	  await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 15000 });
-	} catch (navErr) {
-	  console.log(`⚠️ [${email}] Navigasi lambat, lanjut cek URL...`);
-	}
+    try {
+      await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 15000 });
+    } catch (navErr) {
+      console.log(`⚠️ [${email}] Navigasi lambat, lanjut cek URL...`);
+    }
 
-	
-	const currentUrl = page.url();
-	console.log(`📍 [${email}] URL setelah login: ${currentUrl}`);
+    const currentUrl = page.url();
+    console.log(`📍 [${email}] URL setelah login: ${currentUrl}`);
 
-	if (currentUrl.includes('/speedbump/gaplustos')) {
-	  console.log(`⚠️ [${email}] Terdeteksi Gaplutos, mencoba konfirmasi...`);
-	  
-	  
-	  let confirmButton = await page.$('input#confirm');
-	  if (!confirmButton) {
-		
-		confirmButton = await page.$('button[aria-label*="Confirm"], button:has-text("Confirm"), button:has-text("Saya mengerti")');
-	  }
-	  if (!confirmButton) {
-		
-		await page.keyboard.press('Enter');
-		await delay(3000);
-		confirmButton = await page.$('input#confirm');
-	  }
-	  
-	  if (confirmButton) {
-		await confirmButton.click();
-		
-		await delay(5000); 
-	  } else {
-		
-	  }
-	}
+    if (currentUrl.includes('/speedbump/gaplustos')) {
+      console.log(`⚠️ [${email}] Terdeteksi Gaplutos, mencoba konfirmasi...`);
+      
+      let confirmButton = await page.$('input#confirm');
+      if (!confirmButton) {
+        confirmButton = await page.$('button[aria-label*="Confirm"], button:has-text("Confirm"), button:has-text("Saya mengerti")');
+      }
+      if (!confirmButton) {
+        await page.keyboard.press('Enter');
+        await delay(3000);
+        confirmButton = await page.$('input#confirm');
+      }
+      
+      if (confirmButton) {
+        await confirmButton.click();
+        await delay(5000); 
+      }
+    }
 
-	
-	try {
-	  await page.waitForFunction(
-		() => window.location.href.includes('myaccount.google.com') || 
-			   window.location.href.includes('google.com'),
-		{ timeout: 15000 }
-	  );
-	} catch (err) {
-	  console.log(`❌ [${email}] Gagal masuk ke akun setelah Gaplutos`);
-	  failedAccounts.push({ email, pass });
-	  await browser.close();
-	  return;
-	}
+    try {
+      await page.waitForFunction(
+        () => window.location.href.includes('myaccount.google.com') || 
+               window.location.href.includes('google.com'),
+        { timeout: 15000 }
+      );
+    } catch (err) {
+      console.log(`❌ [${email}] Gagal masuk ke akun setelah Gaplutos`);
+      failedAccounts.push({ email, pass });
+      await browser.close();
+      return;
+    }
 
-	console.log(`✅ Login berhasil: ${email}`);
+    console.log(`✅ Login berhasil: ${email}`);
 
     await page.goto('https://youtube.com/youtube_premium/student');
     await page.waitForSelector('body', { timeout: 15000 });
 
+    // === PERUBAHAN DI SINI ===
     if (page.url().includes("/oops")) {
       console.log(`⚠️ [${email}] Redirect ke /oops - tidak dapat mengakses halaman student`);
+      throw new Error('Redirect ke /oops (Halaman student tidak dapat diakses)');
     }
 
     const tryButtonSelector = `
@@ -324,7 +304,6 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
     }
     await page.keyboard.press('Enter');
 
-    
     try {
       await page.waitForFunction(
         () => window.location.href.includes('https://offers.sheerid.com/'),
@@ -332,7 +311,6 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
       );
     } catch (err) {
       console.log(`⚠️ Tidak redirect ke SheerID langsung, mencoba cara alternatif...`);
-      
       
       for (let i = 0; i < 5; i++) {
         await page.keyboard.press('Tab');
@@ -342,14 +320,11 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
       await delay(3000);
     }
 
-    
     sheerIDUrl = await page.url();
     console.log(`🔗 [Browser ${browserIndex}] URL ditemukan: ${sheerIDUrl}`);
     
-    
     if (sheerIDUrl.includes('sheerid.com')) {
       await saveSheerIDUrl(email, sheerIDUrl);
-      
       
       const akunFilePath = path.join(__dirname, 'akun.txt');
       let currentList = fs.readFileSync(akunFilePath, 'utf-8')
@@ -365,7 +340,6 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
       failedAccounts.push({ email, pass });
     }
 
-    
     await delay(2000);
 
   } catch (err) {
@@ -381,7 +355,6 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
       console.log('⚠️ Browser sudah tertutup lebih dulu:', e.message);
     }
 
-    
     try {
       const userDataDir = path.join(__dirname, 'TEMP', `profile-${browserIndex}`);
       if (fs.existsSync(userDataDir)) {
@@ -390,7 +363,6 @@ const processSingleAccount = async ({ email, pass }, browserIndex, failedAccount
     } catch (_) {}
   }
 };
-
 
 const processAccountsInBatches = async (akunList, threadCount) => {
   const failedAccounts = [];
@@ -415,12 +387,10 @@ const processAccountsInBatches = async (akunList, threadCount) => {
     batchIndex++;
   }
 
-  
   if (failedAccounts.length > 0) {
     const failed = failedAccounts.map(acc => `${acc.email} ${acc.pass}`).join('\n');
     fs.writeFileSync('akun_gagal.txt', failed);
     console.log(`\n⚠️ ${failedAccounts.length} akun gagal, disimpan ke akun_gagal.txt`);
-    
     
     if (fs.existsSync('akun_gagal.txt')) {
       await kirimFileTelegram('akun_gagal.txt');
@@ -429,12 +399,9 @@ const processAccountsInBatches = async (akunList, threadCount) => {
 
   console.log('\n🎉 Proses pengambilan URL SheerID selesai!');
   
-  
   const totalLinks = await displayResults();
   
-  
   await kirimTelegram(`📊 *RINGKASAN SELESAI*\nTotal URL SheerID terkumpul: ${totalLinks}\nFormat: email:link\nFile link.txt telah dikirim sebagai dokumen.`);
-  
   
   const tempDir = path.join(__dirname, 'TEMP');
   if (fs.existsSync(tempDir)) {
@@ -451,20 +418,16 @@ process.on('uncaughtException', (err) => {
   console.error('🔴 [uncaughtException] Bot lanjut jalan. Detail:', err);
 });
 
-
 (async () => {
-  
   if (!fs.existsSync(LINK_FILE)) {
     fs.writeFileSync(LINK_FILE, '');
     console.log('📁 File link.txt dibuat');
   }
   
-  
   const tempDir = path.join(__dirname, 'TEMP');
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
   }
-  
   
   const akunList = fs.readFileSync('akun.txt', 'utf-8')
     .split('\n')
