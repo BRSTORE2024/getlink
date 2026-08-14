@@ -112,8 +112,8 @@ const askThreadCount = () => {
     rl.question('🧵 Mau pakai berapa thread (1-20)? ', answer => {
       rl.close();
       const num = parseInt(answer);
-      if (isNaN(num) || num < 1 || num > 20) {
-        console.log('❌ Input tidak valid. Masukkan angka 1 - 20.');
+      if (isNaN(num) || num < 1 || num > 25) {
+        console.log('❌ Input tidak valid. Masukkan angka 1 - 25.');
         process.exit(1);
       }
       resolve(num);
